@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="home.html"><h2>My Portfolio</h2></a>
+      <button id="logoutBtn">Logout</button>
+    </nav>
+
+    <div class="profile">
+      <img id="p-photo" />
+      <h1 id="p-name">Name</h1>
+      <h3 id="p-career">Career</h3>
+      <p id="p-desc">description</p>
+
+      <ul>
+        <li>Email: <span id="p-email"></span></li>
+        <li>Phone: <span id="p-phone"></span></li>
+        <li>Address: <span id="p-address"></span></li>
+      </ul>
+
+      <a href="edit.html">Edit My Account</a>
+    </div>
+
+    <script type="module" src="firebase-cdn.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
+

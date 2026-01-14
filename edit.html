@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="home.html"><h2>My Portfolio</h2></a>
+      <button id="logoutBtn">Logout</button>
+    </nav>
+
+    <div class="auth-container">
+      <input id="fullname" placeholder="Full Name" />
+      <input id="phone" placeholder="Phone" />
+      <input id="address" placeholder="Address" />
+      <input id="career" placeholder="Career" />
+      <input id="photo" placeholder="Photo URL" />
+      <textarea id="description" placeholder="More about you ..."></textarea>
+      <button id="uploadProfile">Save</button>
+    </div>
+    <script type="module" src="firebase-cdn.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Portfolio App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <a href="home.html"><h2>My Portfolio</h2></a>
+      <!-- <button id="logoutBtn">Logout</button> -->
+    </nav>
+
+    <!-- LOGIN / REGISTER -->
+    <div class="auth-container" id="auth">
+      <h2>Hello</h2>
+      <p
+        style="
+          text-align: center;
+          color: #64748b;
+          margin-top: -10px;
+          margin-bottom: 30px;
+        "
+      >
+        Enter your details to manage your portfolio
+      </p>
+
+      <input type="email" id="email" placeholder="Email Address" required />
+      <input type="password" id="password" placeholder="Password" required />
+
+      <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0" />
+
+      <input type="text" id="fullname" placeholder="Full Name" />
+      <input type="text" id="phone" placeholder="Phone Number" />
+      <textarea
+        id="description"
+        rows="3"
+        placeholder="Brief Bio/Description"
+      ></textarea>
+
+      <button id="register">Create Account</button>
+
+      <p style="text-align: center; font-size: 14px; margin-top: 20px">
+        Already have an account?
+        <a style="text-align: center" href="signin.html">Sign In</a>
+      </p>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
