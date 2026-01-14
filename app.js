@@ -1,42 +1,75 @@
 import { auth, db } from "./firebase-cdn.js";
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut 
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+import { 
+  doc, 
+  setDoc, 
+  getDoc, 
+  updateDoc 
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 /* ================= REGISTER ================= */
-function register() {
-  const email = document.getElementById("email");
-  const password = document.getElementById("password");
-  const fullname = document.getElementById("fullname");
-  const phone = document.getElementById("phone");
-  const address = document.getElementById("address");
-  const career = document.getElementById("career");
-  const description = document.getElementById("description");
-  const photo = document.getElementById("photo");
+async function register() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  
+  // Các thông tin bổ sung
+  const fullname = document.getElementById("fullname").value;
+  const phone = document.getElementById("phone").value;
+  const address = document.getElementById("address").value;
+  const career = document.getElementById("career").value;
+  const description = document.getElementById("description").value;
+  const photo = document.getElementById("photo").value;
 
-  // TODO: create user with email and password FIREBASE AUTH
-  // TODO: after creating user, save additional info to firestore "users" collection
+  try {
+    // 1. Tạo tài khoản trên Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // 2. Lưu thông tin chi tiết vào Firestore collection "users"
+    // Sử dụng UID của user làm ID cho document để dễ dàng quản lý
+    await setDoc(doc(db, "users", user.uid), {
+      fullname: fullname,
+      phone: phone,
+      address: address,
+      career: career,
+      description: description,
+      photo: photo,
+      email: email,
+      createdAt: new Date().toISOString()
+    });
+
+    alert("Đăng ký thành công!");
+    window.location.href = "home.html"; // Chuyển hướng sau khi đăng ký
+  } catch (error) {
+    console.error("Lỗi đăng ký:", error.message);
+    alert("Lỗi: " + error.message);
+  }
 }
 
 /* ================= LOGIN ================= */
-function login() {
-  const email = document.getElementById("email");
-  const password = document.getElementById("password");
-  const fullname = document.getElementById("fullname");
-  const phone = document.getElementById("phone");
-  const address = document.getElementById("address");
-  const career = document.getElementById("career");
-  const description = document.getElementById("description");
-  const photo = document.getElementById("photo");
-  // hide other elements
-  fullname.style.display = "none";
-  phone.style.display = "none";
-  address.style.display = "none";
-  career.style.display = "none";
-  description.style.display = "none";
-  photo.style.display = "none";
-  // TODO: login with email and password FIREBASE AUTH
+async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    alert("Đăng nhập thành công!");
+    window.location.href = "home.html";
+  } catch (error) {
+    console.error("Lỗi đăng nhập:", error.message);
+    alert("Sai tài khoản hoặc mật khẩu!");
+  }
 }
 
 /* ================= AUTH GUARD ================= */
-auth.onAuthStateChanged((user) => {
+// Kiểm tra trạng thái đăng nhập để bảo vệ các trang nội bộ
+onAuthStateChanged(auth, (user) => {
   if (
     !user &&
     (location.href.includes("home") || location.href.includes("edit"))
@@ -46,23 +79,52 @@ auth.onAuthStateChanged((user) => {
 });
 
 /* ================= LOAD PROFILE ================= */
-function loadProfile() {
-  const user = auth.currentUser;
-  if (!user) return;
+async function loadProfile() {
+  // onAuthStateChanged sẽ giúp đảm bảo user đã load xong
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
 
-  // TODO: load user profile from firestore "users" collection and set to form fields
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if(document.getElementById("fullname")) document.getElementById("fullname").value = data.fullname || "";
+        if(document.getElementById("phone")) document.getElementById("phone").value = data.phone || "";
+        if(document.getElementById("address")) document.getElementById("address").value = data.address || "";
+        if(document.getElementById("career")) document.getElementById("career").value = data.career || "";
+        if(document.getElementById("description")) document.getElementById("description").value = data.description || "";
+        if(document.getElementById("photo")) document.getElementById("photo").value = data.photo || "";
+      }
+    }
+  });
 }
 
 /* ================= UPDATE PROFILE ================= */
-function updateProfile() {
+async function updateProfile() {
   const user = auth.currentUser;
   if (!user) return;
-  // TODO: update user profile in firestore "users" collection
+
+  try {
+    const docRef = doc(db, "users", user.uid);
+    await updateDoc(docRef, {
+      fullname: document.getElementById("fullname").value,
+      phone: document.getElementById("phone").value,
+      address: document.getElementById("address").value,
+      career: document.getElementById("career").value,
+      description: document.getElementById("description").value,
+      photo: document.getElementById("photo").value,
+      updatedAt: new Date().toISOString()
+    });
+    alert("Cập nhật thông tin thành công!");
+  } catch (error) {
+    console.error("Lỗi cập nhật:", error);
+    alert("Không thể cập nhật thông tin.");
+  }
 }
 
 /* ================= LOGOUT ================= */
 document.getElementById("logoutBtn")?.addEventListener("click", () => {
-  auth.signOut().then(() => (window.location.href = "index.html"));
+  signOut(auth).then(() => (window.location.href = "index.html"));
 });
 
 /* ================= EVENT LISTENERS ================= */
@@ -70,20 +132,18 @@ document.getElementById("register")?.addEventListener("click", (event) => {
   event.preventDefault();
   register();
 });
+
 document.getElementById("login")?.addEventListener("click", (event) => {
   event.preventDefault();
   login();
 });
-document
-  .getElementById("updateProfile")
-  ?.addEventListener("click", (event) => {
-    event.preventDefault();
-    updateProfile();
-  });
+
+document.getElementById("updateProfile")?.addEventListener("click", (event) => {
+  event.preventDefault();
+  updateProfile();
+});
 
 /* ================= INITIALIZE ================= */
-if (location.pathname.includes("home")) {
+if (location.pathname.includes("home") || location.pathname.includes("edit")) {
   loadProfile();
 }
-
-
